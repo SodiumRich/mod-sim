@@ -21,7 +21,9 @@ for i in range(runs):
             if applicants[0] == 1:
                 yescounter[m] += yescounter[m]
         else:
-            if np.min(applicants[0,m+1]) != 1:
+            end_index = m + 1
+            subset_list = applicants[0:(m+1)]
+            if np.min(subset_list) != 1:
                 best_location = applicants.index(1,m+1)
                 yescounter[best_location] += yescounter[best_location]
                
