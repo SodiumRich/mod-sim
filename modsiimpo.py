@@ -40,10 +40,3 @@ yescountersum = yescounter.sum(axis=0)
 
 print(yescountersum)
 
-
-#Search range i runs
-#Shuffle
-#For m is zero take first value
-#if m is not zero take the min(applicants[:m])
-#for j in applicants[m:]: find the first valye less than x place in rank[i,m]
-#break
