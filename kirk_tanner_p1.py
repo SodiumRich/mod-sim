@@ -10,10 +10,10 @@ import random
 import matplotlib.pyplot as plt
 
 #Define number of applicants
-Number_Apps = 30
+Number_Apps = 50
 
 #Define Top Ranks Acceptable (Top 10 would be N = 10)
-N = 10
+N = 5
 
 #Define number of runs
 runs = 10000
