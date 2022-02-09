@@ -20,26 +20,32 @@ def pendulum(thetaZero = 30., damp = 0., timeSpan = 20., length = 0.45,\
     """
     Parameters
     ----------
-    thetaZero : TYPE, float
-        DESCRIPTION. Initial displacement angle (degrees)
-    damp : TYPE, float
-        DESCRIPTION. Damping coefficient 
-    timeSpan : TYPE, float
-        DESCRIPTION. Time length for simulation 
-    length : TYPE, float
-        DESCRIPTION. Length of pendulum 
-    gravity : TYPE, float
+    thetaZero : TYPE: float
+        DESCRIPTION: Initial displacement angle (degrees)
+        
+    damp : TYPE: float
+        DESCRIPTION: Damping coefficient 
+        
+    timeSpan : TYPE: float
+        DESCRIPTION: Time length for simulation 
+        
+    length : TYPE: float
+        DESCRIPTION: Length of pendulum 
+        
+    gravity : TYPE: float
         DESCRIPTION. Acceleration due to gravity 
-    wZero : TYPE, float
-        DESCRIPTION. Initial  angular  velocity  (degrees/s)\
+        
+    wZero : TYPE: float
+        DESCRIPTION: Initial  angular  velocity  (degrees/s)\
             (positive for counterclockwise) 
 
     Returns
     -------
     None.
     
-    Function creates an animation that compares the simple harmonic oscillation
-    and an differential solution to the swinging of a pendulum.
+    Function creates an animation that compares two pendulums, one using simple
+    harmonic motion and the other using differential equations and numerical
+    methods
 
     """
     
@@ -138,3 +144,10 @@ def pendulum(thetaZero = 30., damp = 0., timeSpan = 20., length = 0.45,\
         
     
     return
+
+
+#A: 
+#B:
+#C: 517
+
+
