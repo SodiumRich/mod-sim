@@ -1,15 +1,22 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sat Feb  5 17:58:40 2022
+Homework P3
+Tanner Kirk
 
-@author: kirkt
+
+Outside Help:
+    Jodie Lawson: Setting the Correct Jacobian
+    StackOverflow: Setting axis' to be equal in size
+    https://stackoverflow.com/questions/17990845/how-to-equalize-the-scales-of-x-axis-and-y-axis-in-matplotlib
+                    
 """
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.integrate as integrate
 
-def pendulum(thetaZero = 30, damp = 0, timeSpan = 5, length = 1,\
-             gravity = 9.80, wZero = 0): 
+def pendulum(thetaZero = 30., damp = 0., timeSpan = 20., length = 0.45,\
+             gravity = 9.80, wZero = 0.): 
     """
     Parameters
     ----------
@@ -30,32 +37,37 @@ def pendulum(thetaZero = 30, damp = 0, timeSpan = 5, length = 1,\
     Returns
     -------
     None.
+    
+    Function creates an animation that compares the simple harmonic oscillation
+    and an differential solution to the swinging of a pendulum.
 
     """
     
     #Ensure these values are positive
     if damp < 0:
-        raise Exception('Error - damp cannot be negative')
+        raise ValueError('Error - damp cannot be negative')
         
-    if timeSpan < 0:
-        raise Exception('Error - timeSpan cannot be negative')
+    elif timeSpan < 0:
+        raise ValueError('Error - timeSpan cannot be negative')
         
-    if length < 0:
-        raise Exception('Error - length cannot be negative')
+    elif length < 0:
+        raise ValueError('Error - length cannot be negative')
         
-    if gravity < 0:
-        raise Exception('Error - gravity cannot be negative')
+    elif gravity < 0:
+        raise ValueError('Error - gravity cannot be negative')
         
     
     #Convert Degrees to Radians
     thetaZeroRad = thetaZero * np.pi / 180
     wZeroRad = wZero * np.pi / 180
     
+    
     #Generate a Time Step based on Refresh Rate of Monitor
     refreshRate = 144
     runTimeStep = 1/refreshRate
     realTimeStep = runTimeStep
     t = np.arange(0, timeSpan, realTimeStep)
+    
     
     #Define Arrays Based off Time Length
     thetaSimple = np.zeros(len(t))
@@ -71,48 +83,58 @@ def pendulum(thetaZero = 30, damp = 0, timeSpan = 5, length = 1,\
         simpleY[i] = length * np.cos(thetaSimple[i])
         
     
-    #Define Differential Y[0] = Damp, Y[1] = Theta
+    #Define Differential Y[0] = theta, Y[1] = Angular Momentum
     def differential(t, y):
-        dy = (y[0],
-              (-damp * y[0]) - ((gravity * np.sin(y[1]))/length))
+        dy = (y[1],
+              -damp * y[1] - ((gravity * np.sin(y[0]))/length))
         return dy
+    
     
     #Define Jacobian
     def jacob(t, y):
-        jacobian = np.array([[1,0],
-                             [ -damp,((-gravity/length) * np.cos(y[1]))]])
+        jacobian = np.array([[0,1],
+                             [ ((-gravity/length) * np.cos(y[0])),-damp]])
         return jacobian
     
     
     #Solve Differentials
     sol = integrate.solve_ivp(fun = differential,
                               t_span = [np.min(t), np.max(t)], 
-                              y0 = [wZeroRad, thetaZeroRad],
+                              y0 = [thetaZeroRad, wZeroRad],
                               t_eval = t, method = "Radau", jac = jacob)
     
     
     #Use Solution to Find X and Y values
     for i in range(len(t)):
-        diffX = length * np.sin(sol.y[1])
-        diffY = length * np.cos(sol.y[1])
+        diffX = length * np.sin(sol.y[0])
+        diffY = length * np.cos(sol.y[0])
     
     
-    #Define Plot Details for Simple Plot
+    #Define Plot Details
     plt.cla()
-    diff, = plt.plot([], [], 'b')
-    simple, = plt.plot([], [], 'o--')
+    diff, = plt.plot([], [], 'ob-', label = "Actual Pendulum")
+    simple, = plt.plot([], [], 'or--', label = "Simple Oscillator")
+    plt.legend()
+    plt.title("Simle Harmonic Oscillator vs An Actual Pendulum")
+    plt.xlabel("X Coordinate (m)")
+    plt.ylabel("Y Coordinate (m)")
+    
+    #Limit Axis Size so Pendulum is Centered
     plt.xlim([-length-0.25,length+0.25])
-    plt.ylim([-length-0.25 ,0.25])
+    plt.ylim([-length-0.25 ,length + 0.25])
     
-    for xPoint, yPoint in zip(simpleX, simpleY):
-        simple.set_data([0,xPoint],[0,-yPoint])
-        plt.pause(runTimeStep)
+    #This scales the axis to be the same size on the screen. 
+    #Prevents the pendulum from seemingly increasing in size
+    plt.gca().set_aspect('equal', adjustable='box') 
     
-    for dxPoint, dyPoint in zip(diffX, diffY):
-        diff.set_data([0,dxPoint],[0,-dyPoint])
-        plt.pause(runTimeStep)
+    
+    #Plot the bottom point on the pendulum, as well as a point at (0,0) 
+    #and a Line Between the Points for each model 
+    for xPoint, yPoint, diffXPoint, diffYPoint \
+        in zip(simpleX, simpleY, diffX, diffY):
+            simple.set_data([0,xPoint],[0,-yPoint])
+            diff.set_data([0,diffXPoint],[0,-diffYPoint])
+            plt.pause(runTimeStep)
         
-    return thetaSimple, simpleX, simpleY, sol, diffX, diffY
-
-
-thetaSimple, simpleX, simpleY, sol, diffX, diffY = pendulum()
+    
+    return
