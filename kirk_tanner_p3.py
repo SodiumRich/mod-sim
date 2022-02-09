@@ -14,6 +14,7 @@ Outside Help:
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.integrate as integrate
+from timeit import default_timer as timer
 
 def pendulum(thetaZero = 30., damp = 0., timeSpan = 20., length = 0.45,\
              gravity = 9.80, wZero = 0.): 
@@ -145,9 +146,7 @@ def pendulum(thetaZero = 30., damp = 0., timeSpan = 20., length = 0.45,\
     
     return
 
-
-#A: 
-#B:
-#C: 517
-
-
+start = timer()
+pendulum()
+end = timer()
+print(end-start)
