@@ -133,6 +133,17 @@ def elba(n0 = (20999, 10000, 1, 0), R = (0.20, 0.20, 0.10, 0.10), \
     ax0.text(timeSpan-30, nDead+500, 'Death Toll = ' + str(int(nDead)))  
     ax0.legend()
 
+    #Define Second Subplot: Cumulative vac vs nonvac rates
+    ax1.plot(t, cumVacSick, label='Vaccinated')
+    ax1.plot(t, cumNonVacSick, label='Nonvaccinated')
+    ax1.set_xlim(0, timeSpan)
+    ax1.set_ylim(-500, 35000)
+    ax1.set_title('Vaccinated vs Nonvaccinated')
+    ax1.set_xlabel('time (days)')
+    ax1.set_ylabel('number of people')
+    ax1.text(timeSpan-30, nDead+500, 'Death Toll = ' + str(int(nDead)))  
+    ax1.legend()
+
     
 
     return n, t, nHealthy
