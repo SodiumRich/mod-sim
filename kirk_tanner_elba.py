@@ -65,88 +65,110 @@ def elba(n0 = (20999, 10000, 1, 0), R = (0.20, 0.20, 0.10, 0.10), \
     k = (k1, k2, k3, k4, k5, k6, k7, k8)
     
     
-    #Call Gillespie
-    gills, nReactions, reactionRecord = gillespie(n0, timeSpan, k, nMax)
-    t = gills[0]
-    n = gills[1]
-    
-    
-    #Pull or Solve for values needed in plots
-    #Final Death Counter
-    nDead = n[-1, 7 ]
-    
-    #Number of Healthy Individuals H + F
-    nHealthy = np.sum(n[:,0:2], axis = 1)
 
-    #Number of Sick Individuals S + SIN + SIV
-    nSick = np.sum(n[:,(2,5,6)], axis = 1)
     
-    #Number of Immune Individuals IN + IV
-    nImmune = np.sum(n[:, (3,4)], axis = 1)
+    if nRun == 1:
+        
+        #Call Gillespie
+        gills, nReactions, reactionRecord = gillespie(n0, timeSpan, k, nMax)
+        t = gills[0]
+        n = gills[1]
+
+        #Pull or Solve for values needed in plots
+        #Final Death Counter
+        nDead = n[-1, 7 ]
+        
+        #Number of Healthy Individuals H + F
+        nHealthy = np.sum(n[:,0:2], axis = 1)
+
+        #Number of Sick Individuals S + SIN + SIV
+        nSick = np.sum(n[:,(2,5,6)], axis = 1)
+        
+        #Number of Immune Individuals IN + IV
+        nImmune = np.sum(n[:, (3,4)], axis = 1)
+        
+        #Tracking Cumulative cases for vaccinated vs nonvaccinated
+        
+        #Preallocate Tracking Terms Second and Third Plots
+        vacSick= np.zeros((len(t), 1))
+        nonVacSick = np.zeros((len(t), 1))
+        sDied = np.zeros((len(t), 1))
+        sinDied = np.zeros((len(t), 1))
+        sivDied = np.zeros((len(t), 1))
+        
+        #Determine when which reaction occurs
+        for i in range(len(t)):
+            if reactionRecord[i] >= 12 and reactionRecord[i] <= 14:
+                vacSick[i] = 1
+            elif (reactionRecord[i] >= 0 and reactionRecord[i] <= 5)\
+                or (reactionRecord[i]>= 9 and reactionRecord[i] <= 11 ):
+                nonVacSick[i] = 1
+            elif reactionRecord[i] == 7:
+                sDied[i] = 1
+            elif reactionRecord[i] == 17:
+                sinDied[i] = 1
+            elif reactionRecord[i] == 18:
+                sivDied[i] = 1
+                
+        #Cumulative Sums of above
+        cumVacSick = np.cumsum(vacSick)
+        cumNonVacSick = np.cumsum(nonVacSick)
+        cumSDied = np.cumsum(sDied)
+        cumSinDied = np.cumsum(sinDied)
+        cumSivDied = np.cumsum(sivDied)
+        
+        
+        #Plotting
+        #Set Up Sub Plots
+        fig, (ax0, ax1, ax2) = plt.subplots(nrows = 1, ncols = 3, \
+                                            constrained_layout=True)
+        
+        fig.suptitle('Stochastic Model of Elba Epidemic\nn0 = ' + str(n0) + \
+                     ', nReactions = ' + str(int(nReactions)))    
+        
+        #Define First Subplot: Healthy, Sick, Immune, Dead vs Time
+        ax0.plot(t, nHealthy, label='Healthy')
+        ax0.plot(t, nSick, label='Sick')
+        ax0.plot(t, nImmune, label='Immune')
+        ax0.plot(t, n[:,7], label='Dead')
+        ax0.set_xlim(0, timeSpan)
+        ax0.set_ylim(-500, 35000)
+        ax0.set_title('Elba vacation for Gillespie: nReactions = ' +\
+                  str(int(nReactions)))
+        ax0.set_xlabel('Time (Days)')
+        ax0.set_ylabel('Number of People')
+        ax0.text(timeSpan-30, nDead+500, 'Death Toll = ' + str(int(nDead)))  
+        ax0.legend()
     
-    #Tracking Cumulative cases for vaccinated vs nonvaccinated
-    
-    #Preallocate Tracking Terms Second and Third Plots
-    vacSick= np.zeros((nMax, 1))
-    nonVacSick = np.zeros((nMax, 1))
-    sDied = np.zeros((nMax, 1))
-    sinDied = np.zeros((nMax, 1))
-    sivDied = np.zeros((nMax, 1))
-    
-    #Determine when which reaction occurs
-    for i in range(len(t)):
-        if reactionRecord[i] >= 12 and reactionRecord[i] <= 14:
-            vacSick[i] = 1
-        elif (reactionRecord[i] >= 0 and reactionRecord[i] <= 5)\
-            or (reactionRecord[i]>= 9 and reactionRecord[i] <= 11 ):
-            nonVacSick[i] = 1
-        elif reactionRecord[i] == 7:
-            sDied[i] = 1
-        elif reactionRecord[i] == 17:
-            sinDied[i] = 1
-        elif reactionRecord[i] == 18:
-            sivDied[i] = 1
+        #Define Second Subplot: Cumulative vac vs nonvac rates
+        ax1.plot(t, cumVacSick, label='Vaccinated')
+        ax1.plot(t, cumNonVacSick, label='Nonvaccinated')
+        ax1.set_xlim(0, timeSpan)
+        ax1.set_ylim(-500, np.max(cumNonVacSick)+5000)
+        ax1.set_title('Cases Vaccinated vs. Nonvaccinated')
+        ax1.set_xlabel('Time (Days)')
+        ax1.set_ylabel('Number of Cases')
+        ax1.legend()
+
+        #Define Third Subplot: Deaths from each Group
+        ax2.plot(t, cumSDied, label='No Immunity')
+        ax2.plot(t, cumSinDied, label='Natural Immunity')
+        ax2.plot(t, cumSivDied, label='Vaccinated')
+        ax2.set_xlim(0, timeSpan)
+        ax2.set_ylim(-5, np.max(cumSDied)+500)
+        ax2.set_title('Deaths by Group')
+        ax2.set_xlabel('Time (Days)')
+        ax2.set_ylabel('Number of People')
+        ax2.legend()
+        
+    else:
+        for i in range(nRun):
+            #Call Gillespie
+            gills, nReactions, reactionRecord = gillespie(n0, timeSpan, k, nMax)
             
-    #Cumulative Sums of above
-    cumVacSick = np.cumsum(vacSick)
-    cumNonVacSick = np.cumsum(nonVacSick)
-    cumSDied = np.cumsum(sDied)
-    cumSinDied = np.cumsum(sinDied)
-    cumSivDied = np.cumsum(sivDied)
-    
-    #Plotting
-    #Set Up Sub Plots
-    fig, (ax0, ax1, ax2) = plt.subplots(nrows = 1, ncols = 3, \
-                                        constrained_layout=True)
-    
-    #Define First Subplot: Healthy, Sick, Immune, Dead vs Time
-    ax0.plot(t, nHealthy, label='Healthy')
-    ax0.plot(t, nSick, label='Sick')
-    ax0.plot(t, nImmune, label='Immune')
-    ax0.plot(t, n[:,7], label='Dead')
-    ax0.set_xlim(0, timeSpan)
-    ax0.set_ylim(-500, 35000)
-    ax0.set_title('Elba vacation for Gillespie: nReactions = ' +\
-              str(int(nReactions)))
-    ax0.set_xlabel('time (days)')
-    ax0.set_ylabel('number of people')
-    ax0.text(timeSpan-30, nDead+500, 'Death Toll = ' + str(int(nDead)))  
-    ax0.legend()
+            
 
-    #Define Second Subplot: Cumulative vac vs nonvac rates
-    ax1.plot(t, cumVacSick, label='Vaccinated')
-    ax1.plot(t, cumNonVacSick, label='Nonvaccinated')
-    ax1.set_xlim(0, timeSpan)
-    ax1.set_ylim(-500, 35000)
-    ax1.set_title('Vaccinated vs Nonvaccinated')
-    ax1.set_xlabel('time (days)')
-    ax1.set_ylabel('number of people')
-    ax1.text(timeSpan-30, nDead+500, 'Death Toll = ' + str(int(nDead)))  
-    ax1.legend()
-
-    
-
-    return n, t, nHealthy
+    return
 
 
 
@@ -266,11 +288,12 @@ def gillespie(n0, timeSpan, k, nMax):
     if nReactions < nMax:
         t = t[0:nReactions+1]
         n = n[0:nReactions+1, :]
+        reactionRecord = reactionRecord[0:nReactions+1]
     
     return (t, n), nReactions, reactionRecord
 
 #=============================================================================
 #Self-test code
 if __name__ == '__main__':
-    n, t, nHealthy = elba(n0 = (20999, 10000, 1, 0), timeSpan = 120)
+    n, t, cumVacSick, vacSick, reactionRecord, cumSivDied = elba(n0 = (20999, 10000, 1, 1400), timeSpan = 120)
 
