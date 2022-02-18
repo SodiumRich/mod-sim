@@ -146,7 +146,4 @@ def pendulum(thetaZero = 30., damp = 0., timeSpan = 20., length = 0.45,\
     
     return
 
-start = timer()
-pendulum()
-end = timer()
-print(end-start)
+pendulum(wZero = 100000000)
