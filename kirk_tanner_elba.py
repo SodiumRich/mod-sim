@@ -28,6 +28,21 @@ def elba(n0 = (20999, 10000, 1, 0), R = (0.20, 0.20, 0.10, 0.10), \
             
         R: Type: Tuple 
             DESCRIPTION: Rate constant adjustment factors (R5, R6, R7, R8)
+            Rate constant adjustment factors R5 and R6 may have values in the
+            range 0 ≤ Ri ≤ 1. A value of 0 indicates perfect protection
+            (immunized person never gets sick) while a value of 1 indicates 
+            totally ineffective immunization. If R5 = R6 then how a person 
+            became immunized (natural immunity vs. vaccination) makes no 
+            difference with regards to getting sick. If R6 < R5 then 
+            vaccination is better than natural immunity while if R5 < R6 
+            then the reverse is true. Constants R7 and R8 may have values in 
+            the range 0 ≤ Ri ≤ 1. A value of 0 indicates perfect protection 
+            (immunized person never dies) while a value of 1 indicates no 
+            benefit of immunization from a mortality perspective. If R7 = R8 
+            are equal then there is no difference between how a person was 
+            immunized with regards to mortality. If R8 < R7 then vaccination is 
+            better than natural immunity while if R7 < R8 then the reverse is 
+            true. 
             
         timeSpan: Type: Float
             DESCRIPTION: Length of simulation (days)
