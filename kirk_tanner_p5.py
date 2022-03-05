@@ -91,9 +91,9 @@ for i in range(testBank):
 res = next(x for x, val in enumerate(percentages)
                                   if val > 0.9) 
 
-print ("To be 90% confident study " + str(res) + " questions.")
+print ("To be 90% confident study " + str(res+1) + " questions.")
 
 res = next(x for x, val in enumerate(percentages)
                                   if val > 0.95) 
 
-print ("T0 be 95% confident study " + str(res) + " questions.")  
+print ("T0 be 95% confident study " + str(res+1) + " questions.")  
