@@ -214,7 +214,7 @@ class Grid:
     
     #Initialized with snakes, max gridsize, boundary conditions, and max
     #number of steps allowed
-    def __init__(self, snakes, gridsize=(20, 20), bc='wall', steps=250):
+    def __init__(self, snakes, gridsize=(20, 20), bc='wall', steps=50):
         '''
         
 
@@ -334,5 +334,5 @@ iggy = snake(position=(5, 5), symbol='^', color='m', direction='east', length = 
 ivey = snake(position=(15, 15), symbol='d', color='r', direction='west', length = 12)
 igor = snake(position=(5, 15), symbol='o', color='g')
 snakes = (iggy, ivey, igor)
-rwalk = Grid(snakes, gridsize=(35, 35), bc='wall')
+rwalk = Grid(snakes, gridsize=(35, 35), bc='periodic')
 rwalk.go()
