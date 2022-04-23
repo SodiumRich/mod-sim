@@ -227,8 +227,7 @@ def seekuence(length, nChildren=20, mutationProbs=(0.01, 0.002, 0.001),\
                     #Set the new best child as the parent for the next generation
                     next_parent = child
                 
-                if match:
-                    break
+
             
             elif scoringFun == 'levenshtein':
                 
@@ -243,12 +242,16 @@ def seekuence(length, nChildren=20, mutationProbs=(0.01, 0.002, 0.001),\
                     #Set the new best child as the parent for the next generation
                     next_parent = child
                 
-                if distance == 0:
-                    break
+                    #If score is zero match is true
+                    if score == 0:
+                        match = True
+
                 
             else:
                 raise ValueError('Score Function must be levenshtein or\
                                  seqscore_target')
+            if match:
+                break
         
         #Set parent to best child from most recent generation
         parent = next_parent
@@ -262,4 +265,4 @@ def seekuence(length, nChildren=20, mutationProbs=(0.01, 0.002, 0.001),\
 #=============================================================================
 #Self-test code #seqscore_target #levenshtein
 if __name__ == '__main__':
-    seekuence(48, 20, (0.01, 0.002, 0.001), 'levenshtein')
+    seekuence(60, 20, (0.01, 0.002, 0.001), 'seqscore_target')

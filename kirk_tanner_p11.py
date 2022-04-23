@@ -245,5 +245,5 @@ def bore(density = 0.6, neighborhood = 'vonNeumann', radius = 1, nGen = None,
 #=============================================================================
 #Self-test code
 if __name__ == '__main__':
-    bore(density = 0.75, neighborhood = 'vonNeumann', radius = 1, nGen = None, 
+    bore(density = 0.75, neighborhood = 'vonNeumann', radius = 1, nGen = 1, 
              pbc = True, grid = False)
