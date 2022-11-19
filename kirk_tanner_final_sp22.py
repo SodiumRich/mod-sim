@@ -14,28 +14,28 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 import matplotlib.ticker as ticker
 
-def myfinal(redTroops = 10, blueTroops = 10, redStrength = 10, \
-            blueStrength = 5, nDays = None, size = 10, grid = True):
+def myfinal(redTroops = 50, blueTroops = 50, redStrength = 5, \
+            blueStrength = 10, nDays = None, size = 50, grid = True):
     """
     Parameters
     ----------
     redTroops : TYPE: int, optional
         DESCRIPTION. Initial number of red Troops, must be at least 1 and 
         at most 10, must be less than grid size
-        The default is 10.
+        The default is 50.
         
     blueTroops : TYPE: int, optional
         DESCRIPTION. Initial number of blue Troops, must be at least 1 and at 
         most 10, must be less than grid size
-        The default is 10.
+        The default is 50.
         
     redstrength : TYPE: int, optional
         DESCRIPTION. Relative strength of red Troops
-        The default is 10.
+        The default is 5.
         
     bluestrength : TYPE: int, optional
         DESCRIPTION. Relative strength of blue Troops
-        The default is 5.
+        The default is 10.
         
     nDays : TYPE, optional
         DESCRIPTION. Max number of days to let simulation run
@@ -180,8 +180,8 @@ def myfinal(redTroops = 10, blueTroops = 10, redStrength = 10, \
         """
         States: unclaimed (0), red territory (1), blue territory (2)
         Rules:
-          rule 1: If no enemy Troops nearby change all adjacent and
-          preceeding nuetral ground to own Troops
+          rule 1: If no enemy Troops march forward with a 25% chance of
+                  moving succesfully
 
           rule 2: If enemy located in neighborhood fight dependent on strength
                   If red wins and blue loses red takes control of area
@@ -191,16 +191,19 @@ def myfinal(redTroops = 10, blueTroops = 10, redStrength = 10, \
         """
 
         #Rule 1
-        #No Red Neighbors and next to Blue Neighbor
-        r1 = (z == 0) & (nWar_red == 0) & (nWar_blue > 0)
+        #Determine if Troop succesfully marches
+        forwardMarch = np.random.binomial(1, 0.325, (N, N))
+        
+        #No Red Neighbors and next to Blue Neighbor and March success
+        r1 = (z == 0) & (nWar_blue > 0) & (forwardMarch == 1)
         z[r1] = 2
         
         #No Blue Neighbors and next to Red Neighbor
-        r1_2 = (z == 0) & (nWar_red > 0) & (nWar_blue == 0)
+        r1_2 = (z == 0) & (nWar_red > 0) & (forwardMarch == 1)
         z[r1_2] = 1
 
-        #Rule 2
-        
+
+        #Rule 2        
         #Determine probabilities based on strengths and number of surrounding
         #enemies
         red_prob = (nWar_red * redStrengthRatio)/10
@@ -228,12 +231,18 @@ def myfinal(redTroops = 10, blueTroops = 10, redStrength = 10, \
         #Set to red
         z[r2_2] = 1
 
+        #Troop Counter
+        redTotal = (z == 1).sum()
+        blueTotal = (z == 2).sum()
+
         #Convert to 1D array
         cplot.set_array(z.ravel())
-        plt.title('Battle for Gridlandia - Day: '+ str(nDays)) 
+        plt.title('Battle for Gridlandia - Day: '+ str(nDays) +
+                  '\nRed Troops:' + str(redTotal) +
+                  '\nBlue Troops:' + str(blueTotal)) 
         
         #Pause so the change is more readable
-        plt.pause(0.4)
+        plt.pause(0.2)
         
         #Stop if max generation is reached
         if nDays == maxGen:
@@ -241,12 +250,14 @@ def myfinal(redTroops = 10, blueTroops = 10, redStrength = 10, \
         
         #Stop if no blue present
         if not (z == 2).any():
-            plt.title('Battle for Gridlandia - Day: '+ str(nDays) + ' - Redinia WINS') 
+            plt.title('Battle for Gridlandia - Day: '+ str(nDays) + 
+                      ' - Redinia WINS' + '\nRed Troops:' + str(redTotal)) 
             stopFlag = True
         
         #Stop if no red present
         if not (z == 1).any():
-            plt.title('Battle for Gridlandia - Day: '+ str(nDays) + ' - Blueberg WINS')
+            plt.title('Battle for Gridlandia - Day: '+ str(nDays) + 
+                      ' - Blueberg WINS' + '\nBlue Troops:' + str(blueTotal))
             stopFlag = True
         
         #Increase counter as next generation begins
@@ -257,5 +268,4 @@ def myfinal(redTroops = 10, blueTroops = 10, redStrength = 10, \
 #=============================================================================
 #Self-test code
 if __name__ == '__main__':
-    myfinal(redTroops = 50, blueTroops = 50, redStrength = 10, \
-                blueStrength = 500, nDays = None, size = 50, grid = True)
+    myfinal()
